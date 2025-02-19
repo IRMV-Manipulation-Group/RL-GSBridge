@@ -1,0 +1,17 @@
+*.pyc
+*#*
+*.pyx
+*.record
+*.tar.gz
+*.tar
+*.swp
+*.npy
+*.ckpt*
+*.idea*
+axcana.egg-info
+.vscode
+.idea
+*.blg
+*.gz
+*.avi
+
