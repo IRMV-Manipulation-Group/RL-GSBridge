@@ -1,0 +1,33 @@
+<?xml version="1.0" ?>
+<robot name="cake">
+  <link name="baseLink">
+    <inertial>
+      <origin xyz="0 0 0.025" rpy="0 0 0" />
+      <mass value="0.07" />
+      <inertia ixx="0.000167" ixy="0" ixz="0" iyy="0.000167" iyz="0"
+          izz="0.000167" />
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+				<mesh filename="/mesh_models/cake_mod_GSmesh.obj" scale="0.02 0.02 0.02"/>
+        <!--nmesh filename="/mesh_models/cake_modify2.obj" scale="0.02 0.02 0.02" -->
+      </geometry>
+       <material name="white">
+        <color rgba="1 0 0 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+     <geometry>
+				<mesh filename="/mesh_models/cake_mod_GSmesh.obj" scale="0.02 0.02 0.02"/>
+      </geometry>
+    </collision>
+     <contact>
+      <lateral_friction value="0.9"/>
+      <rolling_friction value="0.0"/>
+      <contact_cfm value="0.0"/>
+      <contact_erp value="1.0"/>
+    </contact>
+  </link>
+</robot>

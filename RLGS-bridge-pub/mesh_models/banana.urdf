@@ -1,0 +1,33 @@
+<?xml version="1.0" ?>
+<robot name="banana">
+  <link name="baseLink">
+    <inertial>
+      <origin xyz="0 0 0.0245" rpy="0 0 0" /> <!-- -0.074072, 0.005155, 0.307086 -->
+      <mass value="0.356753" />
+      <inertia ixx="0.015342" ixy="0.002726" ixz="-0.009543" iyy="0.118296" iyz="-0.000507"
+          izz="0.111655" />
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+				<mesh filename="/mesh_models/transed_banana_mesh.obj" scale="0.1 0.1 0.1"/>
+        <!--nmesh filename="/mesh_models/cake_modify2.obj" scale="0.02 0.02 0.02" -->
+      </geometry>
+       <material name="white">
+        <color rgba="0.8 0.7 0.267 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+     <geometry>
+				<mesh filename="/mesh_models/transed_banana_mesh.obj" scale="0.1 0.1 0.1"/>
+      </geometry>
+    </collision>
+     <contact>
+      <lateral_friction value="0.9"/>
+      <rolling_friction value="0.0"/>
+      <contact_cfm value="0.0"/>
+      <contact_erp value="1.0"/>
+    </contact>
+  </link>
+</robot>
