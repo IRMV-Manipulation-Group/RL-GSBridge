@@ -5,6 +5,8 @@
 
 Sim2real robot manipulation utilizing GS modeling
 
+https://github.com/user-attachments/assets/4813737a-abe2-4901-9139-059546ecbb1d
+
 Currently Released:
 GS and mesh reconstruction
 Code for policy training and GS rendering with Pybullet 
