@@ -5,7 +5,7 @@
 
 Sim2real robot manipulation utilizing GS modeling
 
-https://github.com/user-attachments/assets/4813737a-abe2-4901-9139-059546ecbb1d
+https://github.com/user-attachments/assets/4b1a21da-309e-41cf-9208-c315509055f8
 
 Currently Released:
 GS and mesh reconstruction
