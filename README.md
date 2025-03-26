@@ -46,7 +46,7 @@ For training, run:
 ```bash
 python train.py -s ./exp_obj_data/banana/ -i mask_banana -m ./exp_obj_GS/banana_mesh_0 --gs_type gs_mesh_norm_aug --num_splats 2 --sh_degree 0
 ```
-Here, 'gs_mesh_norm_aug' represents our soft mesh binding GS method. To run raw GaMeS method, chang gs_type to 'gs_mesh'.
+Here, 'gs_mesh_norm_aug' represents our soft mesh binding GS method. To run raw GaMeS method, change gs_type to 'gs_mesh'.
 
 For evaluation of the training results, run:
 ```bash
