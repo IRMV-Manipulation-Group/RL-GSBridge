@@ -1,8 +1,7 @@
 #! /bin/bash  # employ bash shell
 
 
-OBJECT="bear" # "banana" "toycat" "gift" "large_cube_purple"
-
+OBJECT="banana" 
 DENSE_PATH="/data/exp_obj_data/${OBJECT}/dense"
 OUTPUT_PATH="/data/exp_obj_data/${OBJECT}/scene.mvs"
 IMAGE_FOLDER="/data/exp_obj_data/${OBJECT}/dense/images"

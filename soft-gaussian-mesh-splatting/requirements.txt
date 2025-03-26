@@ -1,0 +1,12 @@
+torch
+torchvision
+torchaudio
+trimesh
+plyfile
+chumpy
+smplx
+numpy
+tqdm
+pillow
+scipy
+git+https://github.com/S-aiueo32/lpips-pytorch.git
