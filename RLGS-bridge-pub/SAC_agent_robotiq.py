@@ -45,49 +45,6 @@ def diff_min(A, B):
         xi = nn.ReLU()(torch.sign(B - A))
     return A*xi + B*(1-xi)
 
-
-# def base_template(s, z1, z2, z3, K = 5):
-#     x_n = s[0]
-#     y_n = s[1]
-#     height = s[2]
-#     gripper_angle = s[5]
-#     finger_angle = s[6]
-#     finger_force = s[7]
-#     pos1 = s[8:11]
-#     orn1 = s[11:14]
-#     pos2 = s[14:17]
-#     orn2 = s[17:20]
-#     action = np.zeros(5)
-#     if finger_force < 1:
-#         action[0] = np.tanh(xdist(pos1, orn1, x_n-0.02) * K)
-#         action[1] = np.tanh(ydist(pos1, orn1, y_n+0.01) * K)
-#         action[2] = np.tanh(K * (pos1[2] + z1 - height))
-#         action[3] = da(gripper_angle, orn1[2])
-#         #action[4] = da(0, finger_angle)
-#         if height < pos1[2] + z1:
-#             action[4] = da(0, finger_angle)
-#     else:
-#         action[0] = np.tanh((pos2[0] - pos1[0]) * K)
-#         action[1] = np.tanh((pos2[1] - pos1[1]) * K)
-#         action[2] = np.tanh(K * (z3 - pos1[2]))
-#         action[3] = da(gripper_angle, orn2[2])
-#         action[4] = da(0, finger_angle)
-
-#         if np.sqrt((pos2[0] - pos1[0]) ** 2 + (pos2[1] - pos1[1]) ** 2) < 0.02:
-#             action[2] = np.tanh(5 * (0.15 - pos1[2]))
-#             if pos1[2] < 0.2:
-#                 action[4] = da(0.2, finger_angle)
-#     return action
-
-# def base1(s):
-#     return base_template(s, z1=0.24, z2=0.35, z3=0.25)
-
-# def base2(s):
-#     return base_template(s, z1=0.24, z2=0.35, z3=0.1)
-
-# def base3(s):
-#     return base_template(s, z1=0.28, z2=0.45, z3=0.35)
-
 class BaseController:
     def __init__(self, z1, z2, z3, z4, K = 5, ang = -0.2, K2=5, Kz2 = 5, refine=False, force=0.0, rot_90=False, dist=0.02, height = 0.09, place=False, bias=0):
         self.count_suc = 0
@@ -124,10 +81,10 @@ class BaseController:
             height4 = self.z4
         return self.base_template(s, height1, height2, height3, height4)
     def base_template(self, s, z1, z2, z3, z4):
-        ### z1 准备夹取高度
-        ### z2: 开爪高度
-        ### z3: 升起高度
-        ### z4: 放置高度
+        ### z1 grasping height
+        ### z2: gripper open height
+        ### z3: lift height
+        ### z4: place height
         ### 因为爪的原点不是最底下，所以z都比较高一点呢
         x_n = s[0]
         y_n = s[1]
@@ -195,14 +152,14 @@ class BaseController:
             self.count_force += 1
         else:
             #print("in setting")
-            ##### 放置物块
+            ##### place the object
             action[0] = np.tanh((pos2[0] - pos1[0]) * self.K2)
             action[1] = np.tanh((pos2[1] - pos1[1]) * self.K2)
             action[2] = np.tanh(self.Kz2 * (z3 - pos1[2]))
             action[3] = dang(gripper_angle, orn2[2])
             action[4] = da(-0.6, finger_angle, K=2)
 
-            #### 松爪：0.15再松，else循环不会进入的
+            #### open the gripper
             #count = 0
             if np.sqrt((pos2[0] - pos1[0]) ** 2 + (pos2[1] - pos1[1]) ** 2) < self.dist:
                 #print("in songzhua")
@@ -222,8 +179,6 @@ class BaseController:
         
         return action
 
-# def base1(s, refine=False):
-#     return base_template(s, z1=0.25, z2=0.35, z3=0.25, z4=0.15)
 
 class Base2(BaseController):
     def __init__(self, refine = False):
@@ -241,8 +196,6 @@ class Base4(BaseController):
         super().__init__(0.03, 0.24, 0.20, 0.20, K2=0, refine=refine, force=-0.6)
         ### bear
         #super().__init__(0.01, 0.24, 0.20, 0.20, K2=0, ang=0, refine=refine, force=-0.6, bias=0.001)
-# def base3(s, refine=False):
-#     return base_template(s, z1=0.3, z2=0.45, z3=0.35, z4=0.15)
 
 
 def base3_ensemble(info):
@@ -643,16 +596,7 @@ class SACWBAgent(object):
         self.target_critic = opt_cuda(Critic(), self.device)
         if self.pretrain:
             print("pretrain:")
-            #self.actor.load_state_dict(torch.load("/data/neural-scene-graphs-3dgs/saves/SAC_t4i_eih/train_SAC_0806_eps_actor_mu/actor_best.pt").state_dict(), strict=False)
-            #self.actor.load_state_dict(torch.load("/data/neural-scene-graphs-3dgs/saves/SAC_t4i_eih/train_SAC_0806_eps_critic_strain_actor_mu/actor_best.pt").state_dict(), strict=False)
-            #self.actor.load_state_dict(torch.load("/data/neural-scene-graphs-3dgs/saves/SAC_t4i_eih/small_cube_SAC_0823_eps_actor/actor_best.pt").state_dict(), strict=False)
-            #self.actor.load_state_dict(torch.load("/data/neural-scene-graphs-3dgs/saves/SAC_t4i_eih/cake_SAC_0815_eps_actor/actor_best.pt").state_dict(), strict=False)
-            #self.actor.load_state_dict(torch.load("/data/neural-scene-graphs-3dgs/saves/SAC_t4i_eih/train_SAC_0806_eps_actor_mu/actor_best.pt").state_dict(), strict=False)
-            #self.actor.load_state_dict(torch.load("/data/neural-scene-graphs-3dgs/saves/SAC_t4i_eih/cake_SAC_0831_eps_actor_useforce/actor_best.pt").state_dict(), strict=False)
             self.actor.load_state_dict(torch.load("/data/neural-scene-graphs-3dgs/saves/SAC_t2i_eih/gift_SAC_0902_2r/actor_best.pt").state_dict(), strict=False)
-            # self.actor.load_state_dict(torch.load("/data/neural-scene-graphs-3dgs/saves/SAC_t4i_eih/toy1_SAC_0821_rot_eps_actor/actor_best.pt").state_dict(), strict=False)
-            # self.critic.load_state_dict(torch.load("/data/neural-scene-graphs-3dgs/saves/SAC_t4i_eih/toy1_SAC_0821_rot_eps_actor/critic.pt").state_dict(), strict=False)
-            # self.target_critic.load_state_dict(torch.load("/data/neural-scene-graphs-3dgs/saves/SAC_t4i_eih/toy1_SAC_0821_rot_eps_actor/critic.pt").state_dict(), strict=False)
         
         soft_update(self.target_critic, self.critic, 1)
         
@@ -777,8 +721,6 @@ class SACWBAgent(object):
                 else:
                     back_up = torch.max(back_up, back_up_d)
             if self.Qb_strain_critic:
-                #### TODO: 存序列的最终成功率，来选择比较好的demo，而不使用Q？
-                #### 这里做了简化：只拿Qb的min比Qa的max大
                 back_up_d1, back_up_d2 = self.critic(sn, base_action_n)
                 back_up_d = diff_min(back_up_d1, back_up_d2)
                 if self.Qb_strain_max:
@@ -861,13 +803,11 @@ class SACWBAgent(object):
 
             actor_loss = (self.alpha.detach() * log_pi - q_a).mean()
             La = Lbc + 0.02 * actor_loss 
-            #La = 0.1 * Lbc + 0.02 * actor_loss #### 原先Lbc无系数，这里希望Lbc的影响小点乘以0.1，现在它比重太大，可能导致Q网络学到了错误的Q估计。。。
 
             self.optimizer_actor.zero_grad()
             La.backward()
             self.optimizer_actor.step()
         else:
-            ### TODO:不用bc的
             print("not implement yet!")
 
         if update_alpha:
@@ -881,34 +821,6 @@ class SACWBAgent(object):
             self.log_alpha_optimizer.step()
 
         return La, Lbc
-
-        
-
-    # def train(self, replay_buffer, L, step):
-    #     #TODO 保留吗？
-    #     if step % self.update_freq != 0:
-    #         return
-
-    #     obs, state, action, reward, next_obs, next_state = replay_buffer.sample()
-    #     obs = self.aug(obs)
-    #     obs = random_color_jitter(obs)
-
-    #     if self.multiview:
-    #         obs = self.encoder(obs[:,:3,:,:], obs[:,3:6,:,:])
-    #     else:
-    #         obs = self.encoder(obs)
-
-    #     with torch.no_grad():
-    #         next_obs = self.aug(next_obs)
-    #         next_obs = random_color_jitter(next_obs)
-    #         if self.multiview:
-    #             next_obs = self.encoder(next_obs[:,:3,:,:], next_obs[:,3:6,:,:])
-    #         else:
-    #             next_obs = self.encoder(next_obs)
-
-    #     self.update_critic(obs, state, action, reward, next_obs, next_state, L, step)
-    #     self.update_actor_and_alpha(obs.detach(), state, L, step)
-    #     utils.soft_update_params(self.critic, self.target_critic, self.tau)
 
     def train(self, frame):
         #TODO 保留吗？
@@ -932,17 +844,10 @@ class SACWBAgent(object):
 
                 if self.color_jitter and frame > 0:#self.frame_num:
                     oi = random_color_jitter(oi)
-                    # save_img = np.transpose(oi[0, :3].detach().cpu().numpy(), (1, 2, 0))
-                    
-                    # output_path = './test_out/test_jitter'
-                    # cv2.imwrite(os.path.join(output_path, '{0:05d}'.format(i) + ".png"), cv2.cvtColor(save_img, cv2.COLOR_RGB2BGR))
-                    ## only actor is affected
-                    #on = random_color_jitter(on)
             
             base_action = np_to_tensor(base_controller(batch['sta1'], self.base), self.device)
             base_action_n = np_to_tensor(base_controller(batch['sta2'], self.base), self.device)
 
-            ### TODO:有说法说这里应该先更新actor? 不过DPG也是先更critic的
             if self.behavior_clone:
                 if self.use_fast:
                     Lc = self.update_critic(oi, si, ai, ri, on, sn, d, base_action_n)

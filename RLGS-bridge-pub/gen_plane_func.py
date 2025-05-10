@@ -17,7 +17,7 @@ if __name__ == "__main__":
     #### bg param
     points = RemoveNoiseStatistical(raw_points, nb_neighbors=50, std_ratio=0.5)
     plane_params, points = DetectMultiPlanes(points, min_ratio=0.2, threshold=0.2)
-    plane_param = plane_params[0] ## bg:2
+    plane_param = plane_params[0] ## choose plane with most points
     #print('ground num', point.shape)
     origin_vector = -plane_param[:3]
     location_vector = np.array([0, 0, 1])
