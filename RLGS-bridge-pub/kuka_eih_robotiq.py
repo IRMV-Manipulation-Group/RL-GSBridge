@@ -740,8 +740,6 @@ class KukaCamEnv4(KukaCamEnvBase):
         s = self._kuka.getObservation()
         finger_angle = s[6]
         finger_force = s[7]
-        #print('finger_force:', finger_force)
-        #dist = np.sqrt((blockPos[0] - block2Pos[0]) ** 2 + (blockPos[1] - block2Pos[1]) ** 2)
         if blockPos[2] > 0.1 and finger_force > 1:#0.076:
             # print("success:True")
             # print('success count:', self.success_count)

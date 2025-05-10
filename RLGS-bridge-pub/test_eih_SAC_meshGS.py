@@ -11,10 +11,25 @@ import cv2
 from gs_rendering import SimGaussian
 import json
 
-def test_actor(n_episodes=100, render=False, mode='de', use_fast=True, use_render=False, simmodel=None, load_mesh=False, bg_pos=None, refine = False, fov = 50, width = 140, obj_infos=None):
-    
-    env = KukaCamEnv4(renders=render, image_output=not use_fast, mode=mode, loadmesh=load_mesh, bg_pos=bg_pos, fov = fov, width=width, obj_infos=obj_infos)
-    base = Base4(refine=False)
+def test_actor(task, log, n_episodes=100, label='', base_ratio=1.0, render=False, mode='de', use_fast=True, use_render=False, simmodel=None, load_mesh=False, bg_pos=None, refine = False, fov = 50, width = 140, obj_infos=None):
+    if base_ratio < 1:
+        print("inloading")
+        with open('saves/SAC_t' + str(task) + label + '_eih/' + log + '/actor_best.pt', 'rb') as fa:
+            actor = opt_cuda(torch.load(fa, map_location=torch.device('cpu')), 0)
+        print("finish loading")
+    if task == 1:
+        env = KukaCamEnv1(renders=render, image_output=not use_fast, mode=mode, loadmesh=load_mesh, width=width)
+        #base = base1
+        raise NotImplementedError("Task 1 not implement yet!")
+    elif task == 2:
+        env = KukaCamEnv2(renders=render, image_output=not use_fast, mode=mode, loadmesh=load_mesh, bg_pos=bg_pos, fov = fov, width=width, obj_infos=obj_infos)
+        base = Base2(refine=False)
+    elif task == 3:
+        env = KukaCamEnv3(renders=render, image_output=not use_fast, mode=mode, loadmesh=load_mesh, bg_pos=bg_pos, fov = fov, width=width, obj_infos=obj_infos)
+        base = Base3(refine=False)
+    else:
+        env = KukaCamEnv4(renders=render, image_output=not use_fast, mode=mode, loadmesh=load_mesh, bg_pos=bg_pos, fov = fov, width=width, obj_infos=obj_infos)
+        base = Base4(refine=False)
 
     success_count = 0
     sum_L = 0
@@ -68,11 +83,26 @@ def test_actor(n_episodes=100, render=False, mode='de', use_fast=True, use_rende
         frame = 0
         R = 0
         while True:
-            action = [0,0,0,0,0]
-            o_next, s_next, r, done, simdata = env.step(action)
-
+            if np.random.uniform(0, 1) < base_ratio:
+                o_next, s_next, r, done, simdata = env.step(base.act(s))
+            else:
+                if not use_fast:
+                    o_t = np_to_tensor(o, actor.device).unsqueeze(dim=0)
+                    s_t = np_to_tensor(s[:8], actor.device).unsqueeze(dim=0)
+                #print("z:", s[2])
+                #print("angle:", s[6])
+                s = np_to_tensor(s, actor.device).unsqueeze(dim=0)
+                with torch.no_grad():
+                    if not use_fast:
+                        a, _, _, _ = actor(o_t, s_t, compute_pi=False, compute_log_pi=False)
+                    else:
+                        a, _, _, _ = actor(s, compute_pi=False, compute_log_pi=False)
+                a = a.cpu().squeeze().numpy()
+                o_next, s_next, r, done, simdata = env.step(a)
+            
             if use_render:
-                ## render_process              
+                ## render_process        
+                ## render_process        
                 rgb = simdata['rgb']
                 rgbImg = cv2.cvtColor(rgb, cv2.COLOR_RGBA2RGB)
                 grip_mask = simdata['mask']
@@ -91,7 +121,7 @@ def test_actor(n_episodes=100, render=False, mode='de', use_fast=True, use_rende
                 #render_img = cv2.rotate(render_img, cv2.ROTATE_90_COUNTERCLOCKWISE)
 
                 import os
-                output_path = './test_out/render_test'
+                output_path = './test_out/banana_fig'
                 if not os.path.exists(output_path):
                     os.mkdir(output_path)
                     os.mkdir(output_path+'/GS')
@@ -115,22 +145,44 @@ def test_actor(n_episodes=100, render=False, mode='de', use_fast=True, use_rende
             frame += 1
             #if frame == 1 or frame == 30 or done:
             #    time.sleep(10)
+            if done or frame >= 115:
+                #print('episode', n+1, 'ends in', frame, 'frames, return =', R)
+                if done:
+                    if R == 1:
+                        sum_L += frame
+                        success_count += 1
+                    else:
+                        misbehavior_count += 1
+                print('Success rate in', n+1, 'episodes is', success_count / (n+1), ';\n')
+                break
         
-    return 
+            
+    print('saves/t', task, label,log)
+    print('Average time in executing the task is', sum_L / success_count, ';\n'
+          'Success rate in', n_episodes, 'episodes is', success_count / n_episodes, ';\n'
+          'Misbehavior rate in', n_episodes, 'episodes is', misbehavior_count / n_episodes, ';\n')
+    print("*******************************************")
+    return sum_L / success_count, success_count / n_episodes, misbehavior_count / n_episodes
 
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-g', '--gpu', type=int, default=0)
-    parser.add_argument('-w', '--width', type=int, default=128)
+    parser.add_argument('-w', '--width', type=int, default=128) ### 140 because of DINOv2
+    parser.add_argument('-l', '--log', type=str, default='1')
+    parser.add_argument('-a', '--imitate', action='store_true')
+    parser.add_argument('-t', '--task', type=int, default=1)
+    parser.add_argument('-q', '--mixed_q', action='store_true')
+    parser.add_argument('-b', '--label', type=str, default='')
     parser.add_argument('-r', '--render', action='store_true')
     parser.add_argument('--mesh', action='store_true')
     args = parser.parse_args()
     print("in test")
     use_render = args.render
     if use_render:
-        obj_names = ['bg_meshGS', 'bear', 'cake']
+        task=args.task
+        obj_names = ['bg_meshGS', 'banana', 'cake']
         obj_path = []
         obj_scale = []
         obj_trans = []
@@ -163,8 +215,8 @@ if __name__ == '__main__':
             'model_list': obj_path, 
             'convert_SHs_python':False, 
             'white_background':True, 
-            'obj_scale_list': obj_scale,
-            'init_trans_list': obj_trans,# [trans_bg, trans_small_cube, trans_cake],  #### GS cord to object center cord
+            'obj_scale_list': obj_scale, # [0.3, 0.075, 0.02]
+            'init_trans_list': obj_trans,# [trans_bg, trans_small_cube, trans_cake],  #### 高斯模型坐标系到物体中心系的变换矩阵
             'after_pos_list': obj_after_pos,  
             'camera_setting':{
                 'FovX':54.8, # 58
@@ -183,4 +235,4 @@ if __name__ == '__main__':
         bg_pos = None
         fov = 50
 
-    test_actor(render=True, n_episodes=32, mode='de',use_fast=False, use_render=use_render, simmodel=simmodel, load_mesh=args.mesh, bg_pos = bg_pos, refine=False, fov = fov, width = args.width, obj_infos = [obj_urdfs, obj_heights])
+    test_actor(task=args.task, log=args.log, label=args.label, render=False, base_ratio=1.0, n_episodes=32, mode='de',use_fast=False, use_render=use_render, simmodel=simmodel, load_mesh=args.mesh, bg_pos = bg_pos, refine=False, fov = fov, width = args.width, obj_infos = [obj_urdfs, obj_heights])

@@ -29,8 +29,10 @@ pip install submodules/diff-gaussian-rasterization
 pip install submodules/simple-knn
 ```
 ### For Sim2Real Policy Training
-**TODO**
-
+To run the sim2real policy, you just need to additionally install the pybullet package:
+```bash
+pip install pybullet
+```
 ## Real2Sim Reconstruction
 ### An Example
 We provide an example of GS training of 'Banana' in our paper. You could download data from [this link]( https://pan.baidu.com/s/1I1kX0oxD16T3Dfacwg6dkQ?pwd=at25), unpack the file and move it to folder **exp_obj_data**.
@@ -71,7 +73,29 @@ Follow the instruction in [SAM-Track](https://github.com/z-x-yang/Segment-and-Tr
 **TODO: FILE NAME DEFINITION**
 #### Data Preprocessing:
 
+## Sim2Real RL Policy Learning
+### An Example
+We provide some existing GS object and background models for 'Banana Grasping' training in [this link](https://pan.baidu.com/s/1EKa9_wKSu1NGgtkYVbhWUg?pwd=im84). 
 
+This file contains GS models of foam pad background and a cake, and their physical params are already recorded in **RLGS-bridge-pub/obj_trans.json**. Please unpack it and put the files into the **exp_obj_GS** folder.
+#### Policy Training:
+```bash
+cd RLGS-bridge-pub
+```
+For policy training with GS rendering, run:
+```bash
+python learn_eih_SAC_meshGS.py -t 4 -q -b -c -i -l 'your training file path' -r -m mono --mesh --strain --color_refine --use_force
+```
+You could find your training logs under the folder **saves**. 
+
+For training withour rendering, just run the code without  **-r**. For more params explaination, please refer to [this repo](https://github.com/IRMVLab/BCLearning).
+#### Policy Test:
+For policy test, run:
+```bash
+python test_eih_SAC_meshGS.py -t 4 -l 'your training file path' -b -r --mesh
+```
+You could find the realistic rendering images under the folder **test_out**
 # Acknowledgements
 * Implementation of soft mesh binding GS inherited from [GaMeS](https://github.com/waczjoan/gaussian-mesh-splatting).
+* Implementation of policy learning inherited from [DDPGwB](https://github.com/IRMVLab/BCLearning)
 

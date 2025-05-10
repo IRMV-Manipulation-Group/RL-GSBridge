@@ -305,7 +305,7 @@ if __name__ == '__main__':
 
     use_render = args.render
     if use_render:
-        obj_names = ['bg_meshGS', 'banana', 'cake']
+        obj_names = ['bg_meshGS', 'banana', 'cake'] ## here choose the object and bgs
         obj_path = []
         obj_scale = []
         obj_trans = []
