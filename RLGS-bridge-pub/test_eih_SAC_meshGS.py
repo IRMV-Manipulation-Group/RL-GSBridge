@@ -180,9 +180,9 @@ if __name__ == '__main__':
     args = parser.parse_args()
     print("in test")
     use_render = args.render
+    obj_names = ['bg_meshGS', 'banana', 'cake']
     if use_render:
         task=args.task
-        obj_names = ['bg_meshGS', 'banana', 'cake']
         obj_path = []
         obj_scale = []
         obj_trans = []
@@ -231,8 +231,17 @@ if __name__ == '__main__':
         simmodel = SimGaussian(params)
         bg_pos = params['after_pos_list'][0]
     else:
+        obj_heights = []
+        obj_urdfs = []
+        with open('./obj_trans.json','r',encoding='utf8')as fp:
+            json_data = json.load(fp)[0]
+        #print(json_data)
+        for obj_name in obj_names:
+            if not ('bg' in obj_name):
+                obj_heights.append(json_data[obj_name]['height'])
+                obj_urdfs.append(json_data[obj_name]['urdf'])
         simmodel = None
         bg_pos = None
         fov = 50
 
-    test_actor(task=args.task, log=args.log, label=args.label, render=False, base_ratio=1.0, n_episodes=32, mode='de',use_fast=False, use_render=use_render, simmodel=simmodel, load_mesh=args.mesh, bg_pos = bg_pos, refine=False, fov = fov, width = args.width, obj_infos = [obj_urdfs, obj_heights])
+    test_actor(task=args.task, log=args.log, label=args.label, render=False, base_ratio=0.0, n_episodes=32, mode='de',use_fast=False, use_render=use_render, simmodel=simmodel, load_mesh=args.mesh, bg_pos = bg_pos, refine=False, fov = fov, width = args.width, obj_infos = [obj_urdfs, obj_heights])

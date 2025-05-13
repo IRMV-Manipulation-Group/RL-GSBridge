@@ -600,7 +600,6 @@ class SACWBAgent(object):
         
         soft_update(self.target_critic, self.critic, 1)
         
-        #self.gamma = 0.994 #wyx change:0.99
         self.gamma = 0.994
         self.tau = 0.005
         self.epsilon = 1
@@ -617,7 +616,7 @@ class SACWBAgent(object):
         self.target_entropy = -np.prod([5,]) ## action shape
         #self.target_entropy = -np.prod([10,])# low entropy
 
-        if self.Qb_strain:
+        if self.self.Qb_strain_critic:
             self.log_lamb1 = torch.tensor(np.log(1)).cuda()
             self.log_lamb2 = torch.tensor(np.log(1)).cuda()
             self.log_lamb3 = torch.tensor(np.log(1)).cuda()
@@ -795,7 +794,7 @@ class SACWBAgent(object):
                     xi = torch.ones_like(q_a)
                 else:
                     xi = nn.ReLU()(torch.sign(q_ai_d - q_a))
-            #print(base_action.shape)
+            
             if self.use_mu:
                 Lbc = (((mu - base_action) ** 2).mean(dim=1, keepdim=True) * xi).sum() / max(xi.sum().item(), 1)
             else:
@@ -808,15 +807,24 @@ class SACWBAgent(object):
             La.backward()
             self.optimizer_actor.step()
         else:
-            print("not implement yet!")
+            if self.use_fast:
+                mu, a, log_pi, log_std = self.actor(si)
+            else:
+                mu, a, log_pi, log_std = self.actor(oi, si_p)
+            q_a1, q_a2 = self.critic(si, a)
+            q_a = torch.min(q_a1, q_a2)
+            La = 0.02 * (self.alpha.detach() * log_pi - q_a).mean()
+            Lbc = 0
+
+            self.optimizer_actor.zero_grad()
+            La.backward()
+            self.optimizer_actor.step()
 
         if update_alpha:
             # print('entropy:', -log_pi)
             # print("target:", self.target_entropy)
             self.log_alpha_optimizer.zero_grad()
             alpha_loss = (self.alpha * (-log_pi - self.target_entropy).detach()).mean()
-
-
             alpha_loss.backward()
             self.log_alpha_optimizer.step()
 
@@ -861,7 +869,7 @@ class SACWBAgent(object):
                     La, _ = self.update_actor_and_alpha(oi.detach(), si, None)
                 else:
                     Lc = self.update_critic(oi, si, ai, ri, on, sn, d, None, sn_p)
-                    La, _ = self.update_actor_and_alpha(oi.detach(), si_p, None)
+                    La, _ = self.update_actor_and_alpha(oi.detach(), si, si_p, None)
             
             total_Lc += Lc.item()
             if self.behavior_clone:
