@@ -291,7 +291,7 @@ if __name__ == '__main__':
     parser.add_argument('-i', '--use_image', action='store_true')
     parser.add_argument('-t', '--task', type=int, default=2)
     parser.add_argument('-q', '--mixed_q', action='store_true')
-    parser.add_argument('-b', '--base_boot', action='store_true')
+    parser.add_argument('-b', '--base_boot', action='store_true') ## enable base Q judge
     parser.add_argument('-c', '--behavior_clone', action='store_true')
     parser.add_argument('--color_refine', action='store_true')
     parser.add_argument('--strain', action='store_true')
@@ -304,13 +304,14 @@ if __name__ == '__main__':
     exp = ['vanilla', 'wMQ', 'wBB', 'nBC', 'wBC', 'nBB', 'nMQ', '']
 
     use_render = args.render
+    obj_names = ['bg_meshGS', 'banana', 'cake'] ## here choose the object and bgs
     if use_render:
-        obj_names = ['bg_meshGS', 'banana', 'cake'] ## here choose the object and bgs
         obj_path = []
         obj_scale = []
         obj_trans = []
         obj_after_pos = []
         obj_heights = []
+        obj_urdfs = []
         with open('./obj_trans.json','r',encoding='utf8')as fp:
             json_data = json.load(fp)[0]
         #print(json_data)
@@ -326,6 +327,7 @@ if __name__ == '__main__':
             else:
                 obj_after_pos.append(None)
                 obj_heights.append(json_data[obj_name]['height'])
+                obj_urdfs.append(json_data[obj_name]['urdf'])
         
         if 'bg_meshGS' in obj_names:
             degree_list = [3, 0, 0]
@@ -352,6 +354,15 @@ if __name__ == '__main__':
         simmodel = SimGaussian(params)
         bg_pos = params['after_pos_list'][0]
     else:
+        obj_heights = []
+        obj_urdfs = []
+        with open('./obj_trans.json','r',encoding='utf8')as fp:
+            json_data = json.load(fp)[0]
+        #print(json_data)
+        for obj_name in obj_names:
+            if not ('bg' in obj_name):
+                obj_heights.append(json_data[obj_name]['height'])
+                obj_urdfs.append(json_data[obj_name]['urdf'])
         simmodel = None
         bg_pos = None
         fov = 50
@@ -364,8 +375,8 @@ if __name__ == '__main__':
     elif args.task == 3:
         env = KukaCamEnv3(renders=False, image_output=args.use_image, mode=args.mode, width=args.width, loadmesh = args.mesh, bg_pos=bg_pos, fov=fov)
     elif args.task == 4:
-        env = KukaCamEnv4(renders=False, image_output=args.use_image, mode=args.mode, width=args.width, loadmesh = args.mesh, bg_pos=bg_pos, fov=fov)
-   
+        env = KukaCamEnv4(renders=False, image_output=args.use_image, mode=args.mode, width=args.width, loadmesh = args.mesh, bg_pos=bg_pos, fov=fov, obj_infos=[obj_urdfs, obj_heights])
+
     if args.use_image:
         log_dir = 'saves/SAC_t' + str(args.task) + 'i_eih/' + args.log#str(args.log)
     else:

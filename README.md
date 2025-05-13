@@ -92,7 +92,7 @@ For training withour rendering, just run the code without  **-r**. For more para
 #### Policy Test:
 For policy test, run:
 ```bash
-python test_eih_SAC_meshGS.py -t 4 -l 'your training file path' -b -r --mesh
+python test_eih_SAC_meshGS.py -t 4 -l 'your training file path' -b i -r --mesh
 ```
 You could find the realistic rendering images under the folder **test_out**
 # Acknowledgements
