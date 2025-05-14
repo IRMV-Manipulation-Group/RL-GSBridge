@@ -1,6 +1,6 @@
 [
     {"bg_meshGS":{
-        "path":"/data/exp_obj_GS/real_mesh_bg3/", 
+        "path":"../exp_obj_GS/real_mesh_bg3/", 
         "plane_trans":[[ 0.99945393,  -0.02669315,   0.01947625,   0       ], 
         [-0.02669315, -0.3048141,   0.95203773,  0       ], 
         [-0.01947625, -0.95203773, -0.30536017,  5.24483497], 
@@ -14,7 +14,7 @@
     }
     , 
     "bg_tablecloth":{
-        "path":"/data/exp_obj_GS/bg_tablecloth_new_mesh_0/", 
+        "path":"../exp_obj_GS/bg_tablecloth_new_mesh_0/", 
         "plane_trans":[[ 0.72703276, -0.64539633,  0.23427964,  0        ], 
         [ -0.64539633, -0.52595754,  0.5539244,  0        ],
         [ -0.23427964, -0.5539244,  -0.79892478,  4.19919222],
@@ -28,7 +28,7 @@
     }
     ,
     "small_cube":{
-        "path":"/data/exp_obj_GS/small_cube_mesh_0/",
+        "path":"../exp_obj_GS/small_cube_mesh_0/",
         "urdf":"mesh_models/small_cube.urdf",
         "plane_trans":[[ 0.94042404,   0.33529471, -0.05639224,  0        ], 
         [ 0.33529471, -0.88704538,  0.31737667,  0        ],
@@ -43,7 +43,7 @@
     }
     , 
     "cake":{
-        "path":"/data/exp_obj_GS/cake_mesh_0/",
+        "path":"../exp_obj_GS/cake_mesh_0/",
         "urdf":"mesh_models/cake_2.urdf",
         "plane_trans":[[ 0.99973982,   0.02045626,  -0.0100917 ,   0       ], 
                     [ 0.02045626 , -0.60831564 ,  0.79343155 ,  0        ], 
@@ -62,7 +62,7 @@
     }
     , 
     "banana":{
-        "path":"/data/exp_obj_GS/banana_mesh_0",
+        "path":"../exp_obj_GS/banana_mesh_0",
         "urdf":"mesh_models/banana.urdf",
         "plane_trans":[[ 0.99544192, -0.08649081,  0.04018356,  0        ],
         [-0.08649081, -0.64118766,  0.76249441,  0        ],
@@ -76,7 +76,7 @@
         "height":0.0245
     },
     "bear":{
-        "path":"/data/exp_obj_GS/bear_mesh_0_w",
+        "path":"../exp_obj_GS/bear_mesh_0_w",
         "urdf":"mesh_models/bear.urdf",
         "plane_trans":[[ 0.99000594, -0.1016513,   0.09775098,  0        ],
         [-0.1016513,  -0.0339127,   0.99424189,  0        ],
