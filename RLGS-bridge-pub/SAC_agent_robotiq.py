@@ -616,7 +616,7 @@ class SACWBAgent(object):
         self.target_entropy = -np.prod([5,]) ## action shape
         #self.target_entropy = -np.prod([10,])# low entropy
 
-        if self.self.Qb_strain_critic:
+        if self.Qb_strain_critic:
             self.log_lamb1 = torch.tensor(np.log(1)).cuda()
             self.log_lamb2 = torch.tensor(np.log(1)).cuda()
             self.log_lamb3 = torch.tensor(np.log(1)).cuda()
