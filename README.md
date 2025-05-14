@@ -75,9 +75,9 @@ Follow the instruction in [SAM-Track](https://github.com/z-x-yang/Segment-and-Tr
 
 ## Sim2Real RL Policy Learning
 ### An Example
-We provide some existing GS object and background models for 'Banana Grasping' training in [this link](https://pan.baidu.com/s/1T5BToLoAaTNn7F1BqWXjIw?pwd=qqu1). 
+We provide some existing GS object and background models for 'Banana Grasping' training in [this link](https://pan.baidu.com/s/1FKDxndYqdZG4kICTgbBpIg?pwd=hirn). 
 
-This file contains GS models of foam pad background and a cake, and their physical params are already recorded in **RLGS-bridge-pub/obj_trans.json**. Please unpack it and put the files into the **exp_obj_GS** folder.
+This file contains GS models of foam pad background and a cake, and their physical params are already recorded in **RLGS-bridge-pub/obj_trans.json**. Please unpack it and put the files into the **exp_obj_GS** folder. 
 #### Policy Training:
 ```bash
 cd RLGS-bridge-pub
